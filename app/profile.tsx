@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect } from "react";
 import Header from "../components/header";
@@ -17,13 +18,15 @@ import { Colors } from "@/constants/Colors";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { MaskedTextInput } from "react-native-mask-text";
-import { useRouter, useNavigation, useLocalSearchParams } from "expo-router";
+import { useRouter, useNavigation, useLocalSearchParams, Redirect } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function profile() {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  // const params = useLocalSearchParams();
+
+  const [isLoading, setIsLoading] = React.useState(true);
 
   const [nome, setNome] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -46,32 +49,34 @@ export default function profile() {
   };
 
   useEffect(() => {
-    iniciaisNome(nome)
-  }, [nome])
 
-  useEffect(() => {
-    if (params.nome) {
-      setNome(String(params.nome));
-      iniciaisNome(String(params.nome))
-    }
+    // if (params.nome) {
+    //   setNome(String(params.nome));
+    //   iniciaisNome(String(params.nome))
+    // }
 
-    if (params.email) {
-      setEmail(String(params.email));
-    }
-
+    // if (params.email) {
+    //   setEmail(String(params.email));
+    // }
     getProfile()
     
   }, []);
 
-  const iniciaisNome = (paramName: string) => {
-    let count = 0
-    let result = paramName.split(' ').map((eachName, index) => {
-      if (index < 2) {
-        return eachName.substring(0, 1).toUpperCase()
-      }
-    }).join('')
+  useEffect(() => {
+      iniciaisNome(nome)
+  }, [nome])
 
-    setIniciais(result)
+  const iniciaisNome = (paramName: string) => {
+    if (paramName !== null) {
+      let count = 0
+      let result = paramName.split(' ').map((eachName, index) => {
+        if (index < 2) {
+          return eachName.substring(0, 1).toUpperCase()
+        }
+      }).join('')
+  
+      setIniciais(result)
+    }
   }
 
   const pickImage = async () => {
@@ -113,11 +118,27 @@ export default function profile() {
         return accumulator
       }, {} as Record<string, any>)
 
-      setImage(response.image);
-      setNome(response.nome);
-      setSobrenome(response.sobrenome);
-      setEmail(response.email);
-      setTelefone(response.telefone);
+
+      if(response.image !== null) {
+        setImage(response.image);
+      }
+      
+      if (response.nome !== null) {
+        setNome(response.nome);
+      }
+
+      if (response.sobrenome !== null) {
+        setSobrenome(response.sobrenome);
+      }
+      
+      if (response.email !== null) {
+        setEmail(response.email);
+      }
+
+      if (response.telefone !== null) {
+        setTelefone(response.telefone);
+      }
+      
       setNotifNews(JSON.parse(response.newsletter));
       setNotifOfertas(JSON.parse(response.ofertas));
 
@@ -125,9 +146,27 @@ export default function profile() {
 
     } catch (e) {
       Alert.alert(`Erro ao obter dados do perfil. ${e}`)
+    } finally {
+      setIsLoading(false);
     }
-
     
+  }
+
+  const logout = async () => {
+    try {
+      await AsyncStorage.clear()
+      router.replace('/onboarding')
+    } catch(e) {
+      Alert.alert(`Erro ao fazer logout. ${e}`);
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size='large'/>
+      </View>
+    );
   }
 
   return (
@@ -251,10 +290,7 @@ export default function profile() {
               }}
             >
               <TouchableOpacity
-                onPress={() => {
-                  setNotifOfertas(!ofertas); 
-                  console.log(ofertas)}}
-              >
+                onPress={() => setNotifOfertas(!ofertas)}>
                 <MaterialIcons
                   name={
                     ofertas ? "check-box" : "check-box-outline-blank"
@@ -283,7 +319,7 @@ export default function profile() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.btnLogout}>
+          <TouchableOpacity style={styles.btnLogout} onPress={logout}>
             <Text style={{ color: "white", fontWeight: "bold" }}>Logout</Text>
           </TouchableOpacity>
 
@@ -296,11 +332,11 @@ export default function profile() {
                 gap: 20,
               }}
             >
-              <TouchableOpacity style={styles.btnRemover}>
+              <TouchableOpacity style={styles.btnRemover} onPress={getProfile}>
                 <Text
                   style={{ color: Colors.primaryColor, fontWeight: "bold" }}
                 >
-                  Cancelar
+                  Cancelar Alterações
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.btnAlterar} onPress={saveAll}>

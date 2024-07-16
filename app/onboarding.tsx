@@ -11,16 +11,20 @@ import React, { useEffect, useState } from "react";
 import { Colors } from "../constants/Colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/header";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 export default function onboarding() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const router = useRouter()
   const isBtnEnable = nome != "" && email != "" ? true : false;
 
   const handleStatusOnboarding = async () => {
     await AsyncStorage.setItem("isOnboardingCompleted", "true");
+    await AsyncStorage.setItem("nome", `${nome}`);
+    await AsyncStorage.setItem("email", `${email}`);
     console.log("gravado onboarding completo!");
+    router.replace('/profile')
   };
 
   return (
@@ -46,19 +50,22 @@ export default function onboarding() {
                 value={email}
               />
 
-              <Link href={{
+              {/* <Link href={{
                 pathname: 'profile',
-                params: {nome: nome, email: email}
+                // params: {nome: nome, email: email}
               }} asChild style={[styles.btnContinuar, isBtnEnable
                       ? { backgroundColor: Colors.primaryColor }
-                      : { backgroundColor: Colors.secondText }]}>
+                      : { backgroundColor: Colors.secondText }]}> */}
                 <TouchableOpacity
                   onPress={handleStatusOnboarding}
                   disabled={!isBtnEnable}
+                  style={[styles.btnContinuar, isBtnEnable
+                    ? { backgroundColor: Colors.primaryColor }
+                    : { backgroundColor: Colors.secondText }]}
                 >
                   <Text style={styles.txtBtnContinuar}>Continuar</Text>
                 </TouchableOpacity>
-              </Link>
+              {/* </Link> */}
             </View>
           </View>
         </View>
