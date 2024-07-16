@@ -1,12 +1,41 @@
 import { View, Text } from 'react-native'
-import React from 'react'
-import Navigation from '../navigation'
+import { Redirect } from 'expo-router';
+import {useState, useEffect} from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoadingScreen from './loading'
+import OnboardingScreen from './onboarding'
+import ProfileScreen from './profile'
 
-export default function app() {
 
-    return (
-        <View>
-            <Navigation />
-        </View>
-  )
+export default function index() {
+
+    const [isLoading, setStatusLoading] = useState(true);
+    const [isOnboardingCompleted, setStatusOnboarding] = useState(false);
+  
+    useEffect(() => {
+      (async () => {
+        try {
+          const value = await AsyncStorage.getItem("isOnboardingCompleted");
+          const parsedJSON = value != null ? JSON.parse(value) : null;
+          setStatusOnboarding(parsedJSON)
+          console.log("async result: " + value);
+        } catch (e) {
+          console.log(e);
+        } finally {
+          console.log("finally");
+          setStatusLoading(false);
+        }
+      })();
+    }, []);
+  
+    if (isLoading) {
+      return <LoadingScreen/>
+    }
+
+    if (isOnboardingCompleted) {
+        return <Redirect href='/profile' />
+    } else {
+        return <Redirect href='/onboarding' />
+    }
+    
 }

@@ -1,12 +1,16 @@
 import {View, Text, Image, StyleSheet } from 'react-native'
 import React from 'react'
 
-export default function header() {
+interface Props{
+  small: true | false;
+}
+
+export default function header({small}:Props) {
   return (
     <View>
       <View style={styles.containerHeader}>
-        <Image style={styles.logo} source={require('../assets/images/Logo.png')} />
-        <Text style={styles.textHeader}>
+        <Image style={small ? styles.logoSmall : styles.logoMedium} source={require('../assets/images/Logo.png')} />
+        <Text style={small ? styles.textHeaderSmall : styles.textHeaderMedium}>
           Little Lemon
         </Text>
       </View>
@@ -20,12 +24,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  textHeader: {
+  textHeaderMedium: {
     fontWeight: 'bold',
     fontSize: 30
   },
-  logo: {
+  logoMedium: {
     width: 80,
     height: 80
+  },
+  textHeaderSmall: {
+    fontWeight: 'bold',
+    fontSize: 15
+  },
+  logoSmall: {
+    width: 40,
+    height: 40
   }
 })
