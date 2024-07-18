@@ -3,9 +3,6 @@ import { Redirect } from 'expo-router';
 import {useState, useEffect} from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingScreen from './loading'
-import OnboardingScreen from './onboarding'
-import ProfileScreen from './profile'
-
 
 export default function index() {
 
@@ -33,7 +30,7 @@ export default function index() {
     }
 
     if (isOnboardingCompleted) {
-        return <Redirect href='/profile' />
+        return <Redirect href='/home' />
     } else {
         return <Redirect href='/onboarding' />
     }

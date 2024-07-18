@@ -21,6 +21,7 @@ import { MaskedTextInput } from "react-native-mask-text";
 import { useRouter, useNavigation, useLocalSearchParams, Redirect } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import GlobalStyles from "../components/globalStyles";
 
 export default function profile() {
   const router = useRouter();
@@ -104,6 +105,8 @@ export default function profile() {
       await AsyncStorage.multiSet(profileObjectString)
     } catch (e) {
       Alert.alert(`Ocorreu um erro ao salvar aos dados. ${e}`);
+    } finally {
+      Alert.alert('Dados salvos.')
     }
 
   }
@@ -161,6 +164,10 @@ export default function profile() {
     }
   }
 
+  const goToBack = async () => {
+    router.back()
+  }
+
   if (isLoading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -170,13 +177,15 @@ export default function profile() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={GlobalStyles.AndroidSafeArea}>
       <View style={styles.header}>
-        <Ionicons
-          name="chevron-back-circle-sharp"
-          size={40}
-          color={Colors.primaryColor}
-        />
+        <TouchableOpacity onPress={goToBack}>
+          <Ionicons
+            name="chevron-back-circle-sharp"
+            size={40}
+            color={Colors.primaryColor}
+          />
+        </TouchableOpacity>
         <Header small={true} />
         {image ? (
                 <Image style={styles.imageProfileHeader} source={{uri: image}} />

@@ -13,6 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/header";
 import { Link, useRouter } from "expo-router";
 
+import GlobalStyles from "../components/globalStyles";
+
 export default function onboarding() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -24,11 +26,11 @@ export default function onboarding() {
     await AsyncStorage.setItem("nome", `${nome}`);
     await AsyncStorage.setItem("email", `${email}`);
     console.log("gravado onboarding completo!");
-    router.replace('/profile')
+    router.replace('/home')
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={GlobalStyles.AndroidSafeArea}>
       <View style={{ flex: 1 }}>
         <Header small={false} />
         <View style={{ flex: 1, justifyContent: "center" }}>
